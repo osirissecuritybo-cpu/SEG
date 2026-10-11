@@ -934,7 +934,7 @@ footer .copy{width:100%;border-top:1px solid rgba(255,255,255,.08);padding-top:1
     if(malos.length){ msg.className = 'cotMsg mal'; msg.textContent = malos.indexOf('cCel') >= 0 && malos.length === 1 ? 'Revisa el número de celular.' : 'Completa los campos marcados.'; document.getElementById(malos[0]).focus(); return; }
     if(o['_honey']) return;
     env.disabled = true; env.textContent = 'Enviando…'; msg.className = 'cotMsg'; msg.textContent = '';
-    fetch('https://formsubmit.co/ajax/osirissecurity.bo@gmail.com', {method:'POST', headers:{'Content-Type':'application/json', 'Accept':'application/json'},
+    fetch('https://formsubmit.co/ajax/3b28ce9c5e25dfe592b336c8d4829a54', {method:'POST', headers:{'Content-Type':'application/json', 'Accept':'application/json'},
       body: JSON.stringify({'_subject':'Cotización: ' + o['Condominio'], '_template':'table', '_captcha':'false', 'Condominio':o['Condominio'], 'Cantidad de guardias':o['Guardias'], 'Ubicación aproximada':o['Ubicación'], 'Facturación':o['Factura'], 'Celular':o['Celular']})})
       .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok || String(j.success) !== 'true') throw new Error(j.message || 'error'); }); })
       .then(function(){
