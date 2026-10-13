@@ -262,7 +262,7 @@ dialog#cotizar::backdrop{background:rgba(10,19,24,.6);-webkit-backdrop-filter:bl
 .campo{display:flex;flex-direction:column;gap:7px;min-width:0;border:0;margin:0;padding:0}
 .campo.ancho{grid-column:1/-1}
 .campo span,.campo legend{font:500 11.5px/1 var(--f-dato);letter-spacing:1px;text-transform:uppercase;color:var(--gris);padding:0}
-.campo input[type=text],.campo input:not([type]),.campo input[type=number],.campo input[type=tel]{height:50px;border:1.5px solid var(--linea);border-radius:12px;padding:0 14px;font:500 17px var(--f-texto);color:var(--tinta);background:var(--blanco);width:100%}
+.campo input[type=text],.campo input:not([type]),.campo input[type=number],.campo input[type=tel],.campo input[type=email]{height:50px;border:1.5px solid var(--linea);border-radius:12px;padding:0 14px;font:500 17px var(--f-texto);color:var(--tinta);background:var(--blanco);width:100%}
 .campo input:focus{outline:none;border-color:var(--pizarra);box-shadow:0 0 0 3px rgba(73,109,127,.18)}
 .campo input.error{border-color:var(--rojo-vivo);box-shadow:0 0 0 3px rgba(224,41,31,.12)}
 .opciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px}
@@ -448,6 +448,7 @@ footer .copy{width:100%;border-top:1px solid rgba(255,255,255,.08);padding-top:1
 .archivo.error{border-color:var(--rojo-vivo)}
 .archivo:focus-within{outline:3px solid var(--rojo-vivo);outline-offset:2px}
 @media (max-width:960px){ .postula{grid-template-columns:1fr;gap:36px} .tarjetaForm{padding:22px 18px} }
+.h2b{margin-top:48px}
 </style>
 </head>
 <body>
@@ -805,12 +806,18 @@ footer .copy{width:100%;border-top:1px solid rgba(255,255,255,.08);padding-top:1
         <div><dt>Uniforme</dt><dd>Te entregamos el uniforme Osiris.</dd></div>
         <div><dt>Estabilidad</dt><dd>Trabajo fijo en condominios residenciales.</dd></div>
       </dl>
-      <p class="req">Requisito: tener entre 20 y 45 años.</p>
+      <h2 class="h2b">Lo que esperamos de ti</h2>
+      <dl class="filas mini">
+        <div><dt>Puntualidad</dt><dd>Llegar a tiempo a cada relevo.</dd></div>
+        <div><dt>Compromiso</dt><dd>Cuidar el edificio como si fuera propio.</dd></div>
+        <div><dt>Atención en el puesto</dt><dd>Estar alerta y atento durante todo el turno.</dd></div>
+        <div><dt>Buen trato</dt><dd>Respeto y amabilidad con residentes y visitas.</dd></div>
+      </dl>
     </div>
 
     <form class="tarjetaForm" id="cvForm" action="https://formsubmit.co/3b28ce9c5e25dfe592b336c8d4829a54" method="POST" enctype="multipart/form-data" novalidate>
       <h3>Envía tu postulación</h3>
-      <input type="hidden" name="_subject" value="Postulación de guardia">
+      <input type="hidden" name="_subject" id="pAsunto" value="Postulación de guardia">
       <input type="hidden" name="_template" value="table">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_next" id="cvNext" value="https://osirissecurity.com.bo/#postulacion-enviada">
@@ -819,6 +826,8 @@ footer .copy{width:100%;border-top:1px solid rgba(255,255,255,.08);padding-top:1
         <label class="campo ancho"><span>Nombre completo</span><input id="pNom" name="Nombre" required autocomplete="name" maxlength="100"></label>
         <label class="campo"><span>Edad</span><input id="pEdad" name="Edad" type="number" inputmode="numeric" min="18" max="70" required></label>
         <label class="campo"><span>Celular</span><input id="pCel" name="Celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="7XXXXXXX" required></label>
+        <label class="campo ancho"><span>Correo electrónico</span><input id="pMail" name="Correo" type="email" inputmode="email" autocomplete="email" placeholder="nombre@correo.com" required maxlength="120"></label>
+        <input type="hidden" name="_replyto" id="pReply">
         <div class="campo ancho"><span>Currículum (PDF)</span>
           <label class="archivo" id="pArchivo"><input id="pCv" name="Curriculum" type="file" accept="application/pdf,.pdf" required><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg><b id="pCvTxt">Toca para elegir tu CV en PDF</b><small>Máximo 5 MB</small></label>
         </div>
@@ -1027,18 +1036,21 @@ footer .copy{width:100%;border-top:1px solid rgba(255,255,255,.08);padding-top:1
     cv.addEventListener('submit', function(e){
       var malos = [], edad = parseInt(document.getElementById('pEdad').value, 10), cel = document.getElementById('pCel').value.replace(/[^0-9]/g, ''), f = cvIn.files[0];
       if(!document.getElementById('pNom').value.trim()) malos.push('pNom');
-      if(!edad) malos.push('pEdad');
+      if(!edad || edad < 16 || edad > 80) malos.push('pEdad');
+      var mail = document.getElementById('pMail').value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) malos.push('pMail');
       if(cel.length < 8) malos.push('pCel');
       var msg = 'Completa los campos marcados.';
       if(!f){ malos.push('pArchivo'); }
       else if(!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf'){ malos.push('pArchivo'); msg = 'El CV tiene que ser un archivo PDF.'; }
       else if(f.size > 5 * 1024 * 1024){ malos.push('pArchivo'); msg = 'El PDF pesa más de 5 MB.'; }
-      if(!malos.length && (edad < 20 || edad > 45)){ malos.push('pEdad'); msg = 'Por ahora buscamos personas de 20 a 45 años.'; }
       if(malos.length){
         e.preventDefault();
         malos.forEach(function(id){ document.getElementById(id).classList.add('error'); });
         cvMsg.className = 'cotMsg mal'; cvMsg.textContent = msg; return;
       }
+      document.getElementById('pReply').value = mail;
+      document.getElementById('pAsunto').value = (edad >= 20 && edad <= 45 ? 'Postulación de guardia · ' : 'Postulación (otro rango) · ') + edad + ' años · ' + document.getElementById('pNom').value.trim();
       var b = document.getElementById('cvEnviar'); b.disabled = true; b.textContent = 'Enviando…';
     });
   }
